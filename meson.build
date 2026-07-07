@@ -327,6 +327,16 @@ else
   ucx_dep = dependency('ucx', modules: ['ucx::ucs', 'ucx::ucp', 'ucx::uct'], required: false)
 endif
 
+if ucx_dep.found()
+    have_ucx_extra_features = cpp.has_header_symbol(
+        'ucp/api/ucp.h',
+        'UCP_PARAM_FIELD_EXTRA_FEATURES',
+        dependencies: ucx_dep)
+    if have_ucx_extra_features
+        add_project_arguments('-DHAVE_UCX_EXTRA_FEATURES', language: 'cpp')
+    endif
+endif
+
 libfabric_path = get_option('libfabric_path')
 if libfabric_path != ''
   libfabric_lib_path = libfabric_path + '/lib'
