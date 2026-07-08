@@ -402,24 +402,24 @@ nixlUcxContext::nixlUcxContext(const std::vector<std::string> &devs,
 
     ucp_params_t ucp_params = {};
 
-#ifdef HAVE_UCX_EXTRA_FEATURES
+#ifdef HAVE_UCX_CTRL_FEATURES
     ucp_params.field_mask = UCP_PARAM_FIELD_FEATURES | UCP_PARAM_FIELD_MT_WORKERS_SHARED |
-                            UCP_PARAM_FIELD_EXTRA_FEATURES;
-    ucp_params.extra_features = nixl::config::getValueDefaulted<uint64_t>(
-        "NIXL_UCX_EXTRA_FEATURES", UCP_FEATURE_AM);
+                            UCP_PARAM_FIELD_CTRL_FEATURES;
+    ucp_params.ctrl_features = nixl::config::getValueDefaulted<uint64_t>(
+        "NIXL_UCX_CTRL_FEATURES", UCP_FEATURE_AM);
     ucp_params.features = UCP_FEATURE_RMA | UCP_FEATURE_AMO32 | UCP_FEATURE_AMO64;
-    if (!(ucp_params.extra_features & UCP_FEATURE_AM)) {
+    if (!(ucp_params.ctrl_features & UCP_FEATURE_AM)) {
         // NIXL requires AM for control messages. Keep the legacy data-scope
-        // behavior when AM was not explicitly enabled as an extra feature.
+        // behavior when AM was not explicitly enabled as a control feature.
         ucp_params.features |= UCP_FEATURE_AM;
     }
     NIXL_DEBUG << "UCP features: " << ucp_params.features
-               << "; UCP extra features: " << ucp_params.extra_features;
+               << "; UCP control features: " << ucp_params.ctrl_features;
 #else
     ucp_params.field_mask = UCP_PARAM_FIELD_FEATURES | UCP_PARAM_FIELD_MT_WORKERS_SHARED;
     ucp_params.features = UCP_FEATURE_RMA | UCP_FEATURE_AMO32 | UCP_FEATURE_AMO64 | UCP_FEATURE_AM;
     NIXL_DEBUG << "UCP features: " << ucp_params.features
-               << "; UCX extra features API is unavailable";
+               << "; UCX control features API is unavailable";
 #endif
 
 #ifdef HAVE_UCX_GPU_DEVICE_API
